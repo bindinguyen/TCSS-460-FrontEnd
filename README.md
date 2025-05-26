@@ -1,4 +1,4 @@
-# TCSS460 Front End - Alpha Sprint
+# TCSS460 Front End - Beta Sprint
 
 # Group 4 Production Sprint Documentation
 
@@ -7,14 +7,14 @@
 
 ## Alpha Sprint Contribution
 
-- **Selly** - Moral Support
-- **Bindi** - Set up Vercel-hosted web app
-- **Jacob** - Moral Support
-- **Bill** - Moral Support
+- **Selly** - Webpage for viewing a single book
+- **Bindi** - Webpage for viewing a list of books
+- **Jacob** - Webpage for resetting password
+- **Bill** - Updating login/register page
 
 ## Alpha Sprint Meetings
 
-5/15 7:00PM
-	Met briefly to discuss who sets up the Vercel app and planned for the next meeting.
+5/20 3:30PM
+	Met to design and plan the layout of the pages and to split up tasks
 
 ## Alpha Sprint Comments
