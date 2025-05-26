@@ -5,18 +5,19 @@ import CredentialsProvider from 'next-auth/providers/credentials';
 // project import
 import axios from 'utils/axios';
 
-function getRandomInt(min: number, max: number) {
-  min = Math.ceil(min);
-  max = Math.floor(max);
-  return Math.floor(Math.random() * (max - min + 1)) + min;
-}
+// Vercel does not like this
+// function getRandomInt(min: number, max: number) {
+//   min = Math.ceil(min);
+//   max = Math.floor(max);
+//   return Math.floor(Math.random() * (max - min + 1)) + min;
+// }
 
-function getRandomPhoneNumber() {
-  const areaCode = getRandomInt(100, 999);
-  const centralOfficeCode = getRandomInt(100, 999);
-  const lineNumber = getRandomInt(1000, 9999);
-  return `${areaCode}-${centralOfficeCode}-${lineNumber}`;
-}
+// function getRandomPhoneNumber() {
+//   const areaCode = getRandomInt(100, 999);
+//   const centralOfficeCode = getRandomInt(100, 999);
+//   const lineNumber = getRandomInt(1000, 9999);
+//   return `${areaCode}-${centralOfficeCode}-${lineNumber}`;
+// }
 
 export const authOptions: NextAuthOptions = {
   providers: [
@@ -52,7 +53,8 @@ export const authOptions: NextAuthOptions = {
         lastname: { name: 'lastname', label: 'Last Name', type: 'text', placeholder: 'Enter Last Name' },
         email: { name: 'email', label: 'Email', type: 'email', placeholder: 'Enter Email' },
         company: { name: 'company', label: 'Company', type: 'text', placeholder: 'Enter Company' },
-        password: { name: 'password', label: 'Password', type: 'password', placeholder: 'Enter Password' }
+        password: { name: 'password', label: 'Password', type: 'password', placeholder: 'Enter Password' },
+        phone: { name: 'phone', label: 'Phone', type: 'tel', placeholder: 'Enter Phone Number' }
       },
       async authorize(credentials) {
         try {
@@ -64,7 +66,8 @@ export const authOptions: NextAuthOptions = {
             email: credentials?.email,
             role: 1,
             username: credentials?.email,
-            phone: getRandomPhoneNumber() // TODO request phone number from user
+            phone: credentials?.phone
+            // phone: getRandomPhoneNumber() // TODO request phone number from user
           });
 
           if (user) {
