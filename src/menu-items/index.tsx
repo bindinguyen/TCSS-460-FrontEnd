@@ -1,7 +1,7 @@
 // project import
 import samplePage from './sample-page';
 import other from './other';
-import pages from './messages';
+import pages from './pages';
 
 // types
 import { NavItemType } from 'types/menu';
