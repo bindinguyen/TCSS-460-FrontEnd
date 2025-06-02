@@ -41,12 +41,9 @@
     "yup": "^1.4.0"
   },
   "devDependencies": {
-    "@babel/core": "^7.27.4",
-    "@types/babel__core": "^7",
     "@types/lodash": "^4.17.7",
     "@types/node": "^22.1.0",
     "@types/react": "^18.3.3",
-    "@types/stylis": "^4",
     "@types/webpack-env": "^1.18.5",
     "@typescript-eslint/eslint-plugin": "^8.0.1",
     "@typescript-eslint/parser": "^8.0.1",
@@ -57,7 +54,6 @@
     "eslint-plugin-prettier": "^5.2.1",
     "immutable": "^4.3.7",
     "prettier": "^3.3.3",
-    "stylis": "^4.3.6",
     "typescript": "5.3.3"
   },
   "packageManager": "yarn@4.4.1"
