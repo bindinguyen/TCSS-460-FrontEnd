@@ -6,6 +6,7 @@ import Pagination from '@mui/material/Pagination';
 import Container from '@mui/material/Container';
 import BookCard from 'components/BookCard';
 import SearchBar from 'components/SearchBar';
+import Link from 'next/link';
 
 import axios from 'utils/axios';
 import { IBook } from 'types/book';
@@ -44,7 +45,7 @@ export default function BookListPage() {
       <Grid container columns={3} spacing={2} sx={{ justifyContent: 'spaceAround', display: 'flex' }}>
         {books.map((data) => (
           <Grid item key={data.title} xs={1}>
-            {BookCard(data)}
+            <Link href={`/viewbookdetails/${data.isbn13}`}>{BookCard(data)}</Link>
           </Grid>
         ))}
       </Grid>

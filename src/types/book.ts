@@ -1,11 +1,11 @@
 export interface IBook {
   isbn13: number;
   authors: string;
-  publication: number;
+  publication_year: number;
   original_title: string;
   title: string;
-  rating_avg: number;
-  count: number;
+  rating_avg: string;
+  rating_count: number;
   rating_1: number;
   rating_2: number;
   rating_3: number;

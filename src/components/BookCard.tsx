@@ -9,7 +9,7 @@ import { IBook } from 'types/book';
 
 export default function BookCard(data: IBook) {
   // insert path to viewing 1 book here
-  const path = `viewbookdetails`;
+  const path = `viewbookdetails/${data.isbn13}`;
   return (
     <Card sx={{ height: '100%', alignItems: 'center' }}>
       <CardActionArea href={path}>
