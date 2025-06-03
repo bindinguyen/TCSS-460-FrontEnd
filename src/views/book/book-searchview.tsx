@@ -1,3 +1,4 @@
+/* eslint-disable react/no-unescaped-entities */
 'use client';
 
 import * as React from 'react';
@@ -102,7 +103,7 @@ export default function BookListPage() {
     }, 500); // 500ms delay
 
     return () => clearTimeout(timeoutId);
-  }, [searchQuery, searchCriteria]);
+  }, [searchQuery, searchCriteria, loadBooks]);
 
   const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSearchQuery(event.target.value);
@@ -209,7 +210,7 @@ export default function BookListPage() {
               {searchQuery && (
                 <span style={{ fontWeight: 500 }}>
                   {' '}
-                  for "{searchQuery}" in {currentOption?.label.toLowerCase()}
+                  for '{searchQuery}' in {currentOption?.label.toLowerCase()}
                 </span>
               )}
             </>
