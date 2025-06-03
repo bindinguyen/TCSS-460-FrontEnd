@@ -28,6 +28,9 @@ export default function BookListPage() {
   const [resultsPerPage, setResultsPerPage] = React.useState<number>(51);
   const [isLoading, setIsLoading] = React.useState<boolean>(false);
 
+  // vercel temp fix
+  console.log(setResultsPerPage);
+
   // Search criteria options
   const searchOptions = [
     { value: 'title', label: 'Title', symbol: '📖' },
@@ -40,7 +43,7 @@ export default function BookListPage() {
   // API endpoint mapping for different search criteria
   const getSearchEndpoint = (criteria: string, query: string, page: number, limit: number) => {
     const baseUrl = 'https://tcss460-group1-web-api-d9b1e8b26f0f.herokuapp.com/';
-    
+
     switch (criteria) {
       case 'title':
         return `${baseUrl}/c/books/title?title=${encodeURIComponent(query)}`;
@@ -62,7 +65,7 @@ export default function BookListPage() {
     setIsLoading(true);
     try {
       let endpoint: string;
-      
+
       if (searchQuery.trim()) {
         // Make specific search API call based on criteria
         endpoint = getSearchEndpoint(searchCriteria, searchQuery.trim(), currentPage, resultsPerPage);
@@ -120,16 +123,16 @@ export default function BookListPage() {
     setPageNumber(1);
   };
 
-  const currentOption = searchOptions.find(opt => opt.value === searchCriteria);
+  const currentOption = searchOptions.find((opt) => opt.value === searchCriteria);
 
   return (
     <Container maxWidth="lg" sx={{ py: 4 }}>
       {/* Header */}
       <Box sx={{ mb: 4, textAlign: 'center' }}>
-        <Typography 
-          variant="h3" 
-          component="h1" 
-          gutterBottom 
+        <Typography
+          variant="h3"
+          component="h1"
+          gutterBottom
           sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 2 }}
         >
           <span style={{ fontSize: '48px' }}>📚</span>
@@ -150,11 +153,7 @@ export default function BookListPage() {
                 value={searchCriteria}
                 label="Search By"
                 onChange={handleCriteriaChange}
-                endAdornment={
-                  <Box sx={{ mr: 1, fontSize: '20px' }}>
-                    {currentOption?.symbol}
-                  </Box>
-                }
+                endAdornment={<Box sx={{ mr: 1, fontSize: '20px' }}>{currentOption?.symbol}</Box>}
               >
                 {searchOptions.map((option) => (
                   <MenuItem key={option.value} value={option.value}>
@@ -167,7 +166,7 @@ export default function BookListPage() {
               </Select>
             </FormControl>
           </Grid>
-          
+
           <Grid item xs={12} md={7}>
             <TextField
               fullWidth
@@ -175,11 +174,11 @@ export default function BookListPage() {
               value={searchQuery}
               onChange={handleSearchChange}
               placeholder={
-                searchCriteria === 'average_rating' 
-                  ? 'Enter minimum rating (e.g., 4.0)' 
+                searchCriteria === 'average_rating'
+                  ? 'Enter minimum rating (e.g., 4.0)'
                   : searchCriteria === 'original_publication_year'
-                  ? 'Enter year (e.g., 2020)'
-                  : `Enter ${currentOption?.label.toLowerCase() || 'title'}`
+                    ? 'Enter year (e.g., 2020)'
+                    : `Enter ${currentOption?.label.toLowerCase() || 'title'}`
               }
               InputProps={{
                 startAdornment: (
@@ -190,15 +189,9 @@ export default function BookListPage() {
               }}
             />
           </Grid>
-          
+
           <Grid item xs={12} md={2}>
-            <Button
-              fullWidth
-              variant="outlined"
-              onClick={clearSearch}
-              sx={{ height: '56px' }}
-              startIcon={<span>✕</span>}
-            >
+            <Button fullWidth variant="outlined" onClick={clearSearch} sx={{ height: '56px' }} startIcon={<span>✕</span>}>
               Clear
             </Button>
           </Grid>
@@ -208,12 +201,15 @@ export default function BookListPage() {
       {/* Results Info */}
       <Box sx={{ mb: 3 }}>
         <Typography variant="body1" color="text.secondary">
-          {isLoading ? 'Loading...' : (
+          {isLoading ? (
+            'Loading...'
+          ) : (
             <>
               {totalResults} result{totalResults !== 1 ? 's' : ''} found
               {searchQuery && (
                 <span style={{ fontWeight: 500 }}>
-                  {' '}for "{searchQuery}" in {currentOption?.label.toLowerCase()}
+                  {' '}
+                  for "{searchQuery}" in {currentOption?.label.toLowerCase()}
                 </span>
               )}
             </>
@@ -233,13 +229,15 @@ export default function BookListPage() {
           {books.map((data) => (
             <Grid item key={data.isbn13 || data.title} xs={1}>
               <Link href={`/viewbookdetails/${data.isbn13}`}>
-                <Box sx={{ 
-                  cursor: 'pointer',
-                  transition: 'transform 0.2s',
-                  '&:hover': {
-                    transform: 'translateY(-4px)'
-                  }
-                }}>
+                <Box
+                  sx={{
+                    cursor: 'pointer',
+                    transition: 'transform 0.2s',
+                    '&:hover': {
+                      transform: 'translateY(-4px)'
+                    }
+                  }}
+                >
                   {BookCard(data)}
                 </Box>
               </Link>
