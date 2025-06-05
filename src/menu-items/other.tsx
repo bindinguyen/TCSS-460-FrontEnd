@@ -52,7 +52,7 @@ const other: NavItemType = {
     },
     {
       id: 'reset-pass',
-      title: <FormattedMessage id="reset password" />,
+      title: <FormattedMessage id="reset-password" />,
       type: 'item',
       url: '/reset-pass',
       icon: LockResetIcon
