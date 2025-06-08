@@ -18,6 +18,7 @@ import Link from 'next/link';
 
 import axios from 'utils/axios';
 import { IBook } from 'types/book';
+import CardHeader from '@mui/material/CardHeader';
 
 export default function BookListPage() {
   const [searchQuery, setSearchQuery] = React.useState<string>('');
@@ -123,8 +124,8 @@ export default function BookListPage() {
   const currentOption = searchOptions.find(opt => opt.value === searchCriteria);
 
   return (
+
     <Container maxWidth="lg" sx={{ py: 4 }}>
-      {/* Header */}
       <Box sx={{ mb: 4, textAlign: 'center' }}>
         <Typography 
           variant="h3" 
