@@ -18,6 +18,10 @@ export default function BookListPage() {
   const [currentPage, setPageNumber] = React.useState<number>(0);
   const [resultsPerPage, setResultsPerPage] = React.useState<number>(51);
 
+  // vercel temp fix
+  console.log(searchQuery);
+  console.log(setResultsPerPage);
+
   React.useEffect(() => {
     axios
       .get(

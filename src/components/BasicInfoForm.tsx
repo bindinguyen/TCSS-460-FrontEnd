@@ -1,6 +1,6 @@
 import React from 'react';
 import { Typography, TextField, Grid } from '@mui/material';
-import { Field, ErrorMessage } from 'formik';
+import { Field } from 'formik';
 
 const BasicInfoForm: React.FC = () => {
   return (

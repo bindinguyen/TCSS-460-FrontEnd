@@ -16,7 +16,6 @@ const BookDetails = () => {
   const [userRating, setUserRating] = useState<number | null>(null);
   console.log('isbn: ', isbn13);
 
-
   React.useEffect(() => {
     if (!isbn13) return;
 
@@ -31,11 +30,7 @@ const BookDetails = () => {
         console.error(error);
         setLoading(false);
       });
-      
   }, [isbn13]);
-
-  
-  
 
   if (loading) {
     return (
@@ -57,7 +52,7 @@ const BookDetails = () => {
       </Box>
     );
   }
-  console.log("ISBN: ", book.isbn13);
+  console.log('ISBN: ', book.isbn13);
   return (
     <Box maxWidth={600} mx="auto" mt={4}>
       <Button variant="outlined" sx={{ mb: 2 }} onClick={() => router.back()}>
