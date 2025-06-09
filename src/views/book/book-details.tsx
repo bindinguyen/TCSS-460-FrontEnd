@@ -1,15 +1,16 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Box, Typography, Card, CardMedia, CardContent, Rating, Stack } from '@mui/material';
+import { Box, Typography, Card, CardMedia, CardContent, Rating, Stack, Button, CircularProgress } from '@mui/material';
 import { Accordion, AccordionSummary, AccordionDetails } from '@mui/material';
 import ExpandMore from '@mui/icons-material/ExpandMore';
-import { useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import axios from 'utils/axios';
 import { IBook } from 'types/book';
 
 const BookDetails = () => {
   const { isbn13 } = useParams();
+  const router = useRouter();
   const [book, setBook] = useState<IBook | null>(null);
   const [loading, setLoading] = React.useState<boolean>(true);
   const [userRating, setUserRating] = useState<number | null>(null);
@@ -34,6 +35,7 @@ const BookDetails = () => {
   if (loading) {
     return (
       <Box maxWidth={600} mx="auto" mt={4}>
+        <CircularProgress color="primary" />
         <Typography variant="h6" align="center" mt={4}>
           Loading book details...
         </Typography>
@@ -53,8 +55,11 @@ const BookDetails = () => {
   console.log('ISBN: ', book.isbn13);
   return (
     <Box maxWidth={600} mx="auto" mt={4}>
+      <Button variant="outlined" sx={{ mb: 2 }} onClick={() => router.back()}>
+        Back to Book List
+      </Button>
       <Card>
-        <CardMedia component="img" height="350" image={book.image_url} alt={JSON.stringify(book.title)} />
+        <CardMedia component="img" height="350" image={book.image_url} alt={JSON.stringify(book.title)} sx={{ height: 200, width: 140, objectFit: 'contain', mx: 'auto', my: 2 }} />
         <CardContent>
           <Stack direction="row" alignItems="center" spacing={2}>
             <Typography variant="h4" gutterBottom>
