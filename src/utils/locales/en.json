@@ -9,11 +9,14 @@
   "maintenance": "Maintenance",
   "messages": "Messages",
   "books": "Books",
-  "view-books": "Search for a book",
+  "view-books": "View all books",
   "others": "Others",
   "pages": "Pages",
   "sample-page": "Sample Page",
   "send-message": "Send Message",
   "under-construction": "Under Construction",
-  "view-messages": "View Messages"
+  "view-messages": "View Messages", 
+  "search-books": "Search for a book",
+  "add-books": "Add a Book",
+  "reset-password": "Reset Password"
 }

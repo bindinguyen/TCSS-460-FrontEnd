@@ -6,8 +6,8 @@ import DeleteBook from 'components/DeleteButton';
 export default function BookPage() {
   return (
     <>
-      <BookDetails />;
-      <DeleteBook />;
+      <BookDetails />
+      <DeleteBook />
     </>
   );
 }

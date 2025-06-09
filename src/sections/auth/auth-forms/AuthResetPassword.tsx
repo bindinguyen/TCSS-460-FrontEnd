@@ -1,14 +1,12 @@
 'use client';
 
-import { useEffect, useState, SyntheticEvent } from 'react';
+import React, { useState, FocusEvent, SyntheticEvent } from 'react';
 
 // next
-import { useRouter } from 'next/navigation';
+import { signIn } from 'next-auth/react';
 
 // material-ui
-import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
-import FormControl from '@mui/material/FormControl';
 import FormHelperText from '@mui/material/FormHelperText';
 import Grid from '@mui/material/Grid';
 import InputAdornment from '@mui/material/InputAdornment';
@@ -19,181 +17,230 @@ import Typography from '@mui/material/Typography';
 
 // third party
 import * as Yup from 'yup';
+import { preload } from 'swr';
 import { Formik } from 'formik';
 
 // project import
 import IconButton from 'components/@extended/IconButton';
 import AnimateButton from 'components/@extended/AnimateButton';
 
-import { openSnackbar } from 'api/snackbar';
-import useScriptRef from 'hooks/useScriptRef';
-import { strengthColor, strengthIndicator } from 'utils/password-strength';
-
-// types
-import { SnackbarProps } from 'types/snackbar';
-import { StringColorProps } from 'types/password';
+import { APP_DEFAULT_PATH } from 'config';
+import { fetcher } from 'utils/axios';
 
 // assets
 import EyeOutlined from '@ant-design/icons/EyeOutlined';
 import EyeInvisibleOutlined from '@ant-design/icons/EyeInvisibleOutlined';
 
-// ============================|| STATIC - RESET PASSWORD ||============================ //
+export default function PasswordResetForm({ providers, csrfToken }: any) {
+  const [capsWarning, setCapsWarning] = useState(false);
 
-export default function AuthResetPassword() {
-  const scriptedRef = useScriptRef();
-  const router = useRouter();
+  const [showCurrentPassword, setShowCurrentPassword] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
 
-  const [level, setLevel] = useState<StringColorProps>();
-  const [showPassword, setShowPassword] = useState(false);
-  const handleClickShowPassword = () => {
-    setShowPassword(!showPassword);
+  const handleClickShowCurrentPassword = () => {
+    setShowCurrentPassword(!showCurrentPassword);
+  };
+
+  const handleClickShowNewPassword = () => {
+    setShowNewPassword(!showNewPassword);
   };
 
   const handleMouseDownPassword = (event: SyntheticEvent) => {
     event.preventDefault();
   };
 
-  const changePassword = (value: string) => {
-    const temp = strengthIndicator(value);
-    setLevel(strengthColor(temp));
+  const onKeyDown = (keyEvent: any) => {
+    if (keyEvent.getModifierState('CapsLock')) {
+      setCapsWarning(true);
+    } else {
+      setCapsWarning(false);
+    }
   };
 
-  useEffect(() => {
-    changePassword('');
-  }, []);
-
   return (
-    <Formik
-      initialValues={{
-        password: '',
-        confirmPassword: '',
-        submit: null
-      }}
-      validationSchema={Yup.object().shape({
-        password: Yup.string().max(255).required('Password is required'),
-        confirmPassword: Yup.string()
-          .required('Confirm Password is required')
-          .test('confirmPassword', 'Both Password must be match!', (confirmPassword, yup) => yup.parent.password === confirmPassword)
-      })}
-      onSubmit={async (values, { setErrors, setStatus, setSubmitting }) => {
-        try {
-          // password reset
-          if (scriptedRef.current) {
-            setStatus({ success: true });
-            setSubmitting(false);
-
-            openSnackbar({
-              open: true,
-              message: 'Successfuly reset password.',
-              variant: 'alert',
-              alert: {
-                color: 'success'
+    <>
+      <Formik
+        initialValues={{
+          email: '', // TODO for dev work, you can hardcode a known user and password here
+          currentPassword: '',
+          newPassword: '',
+          submit: null
+        }}
+        validationSchema={Yup.object().shape({
+          email: Yup.string().email('Must be a valid email').max(255).required('Email is required'),
+          currentPassword: Yup.string()
+            .required('Current password is required')
+            .test('no-leading-trailing-whitespace', 'Password cannot start or end with spaces', (value) => value === value.trim())
+            .min(11, 'Password must be 11 or more characters'),
+          newPassword: Yup.string()
+            .required('New password is required')
+            .test('no-leading-trailing-whitespace', 'Password cannot start or end with spaces', (value) => value === value.trim())
+            .min(11, 'Password must be 11 or more characters')
+            .test('passwords-different', 'New password must be different from current password', function (value) {
+              return value !== this.parent.currentPassword;
+            })
+        })}
+        onSubmit={(values, { setErrors, setSubmitting }) => {
+          const trimmedEmail = values.email.trim();
+          // TODO: Replace this with your password reset API call
+          // This is a placeholder - you'll need to implement the actual password reset logic
+          signIn('reset-password', {
+            redirect: false,
+            email: trimmedEmail,
+            currentPassword: values.currentPassword,
+            newPassword: values.newPassword,
+            callbackUrl: APP_DEFAULT_PATH
+          }).then(
+            (res: any) => {
+              if (res?.error) {
+                setErrors({ submit: res.error });
+                setSubmitting(false);
+              } else {
+                preload('api/menu/dashboard', fetcher);
+                setSubmitting(false);
+                // TODO: Add success message or redirect
               }
-            } as SnackbarProps);
-
-            setTimeout(() => {
-              router.push('/login');
-            }, 1500);
-          }
-        } catch (err: any) {
-          console.error(err);
-          if (scriptedRef.current) {
-            setStatus({ success: false });
-            setErrors({ submit: err.message });
-            setSubmitting(false);
-          }
-        }
-      }}
-    >
-      {({ errors, handleBlur, handleChange, handleSubmit, isSubmitting, touched, values }) => (
-        <form noValidate onSubmit={handleSubmit}>
-          <Grid container spacing={3}>
-            <Grid item xs={12}>
-              <Stack spacing={1}>
-                <InputLabel htmlFor="password-reset">Password</InputLabel>
-                <OutlinedInput
-                  fullWidth
-                  error={Boolean(touched.password && errors.password)}
-                  id="password-reset"
-                  type={showPassword ? 'text' : 'password'}
-                  value={values.password}
-                  name="password"
-                  onBlur={handleBlur}
-                  onChange={(e) => {
-                    handleChange(e);
-                    changePassword(e.target.value);
-                  }}
-                  endAdornment={
-                    <InputAdornment position="end">
-                      <IconButton
-                        aria-label="toggle password visibility"
-                        onClick={handleClickShowPassword}
-                        onMouseDown={handleMouseDownPassword}
-                        edge="end"
-                        color="secondary"
-                      >
-                        {showPassword ? <EyeOutlined /> : <EyeInvisibleOutlined />}
-                      </IconButton>
-                    </InputAdornment>
-                  }
-                  placeholder="Enter password"
-                />
-              </Stack>
-              {touched.password && errors.password && (
-                <FormHelperText error id="helper-text-password-reset">
-                  {errors.password}
-                </FormHelperText>
-              )}
-              <FormControl fullWidth sx={{ mt: 2 }}>
-                <Grid container spacing={2} alignItems="center">
-                  <Grid item>
-                    <Box sx={{ bgcolor: level?.color, width: 85, height: 8, borderRadius: '7px' }} />
-                  </Grid>
-                  <Grid item>
-                    <Typography variant="subtitle1" fontSize="0.75rem">
-                      {level?.label}
-                    </Typography>
-                  </Grid>
-                </Grid>
-              </FormControl>
-            </Grid>
-            <Grid item xs={12}>
-              <Stack spacing={1}>
-                <InputLabel htmlFor="confirm-password-reset">Confirm Password</InputLabel>
-                <OutlinedInput
-                  fullWidth
-                  error={Boolean(touched.confirmPassword && errors.confirmPassword)}
-                  id="confirm-password-reset"
-                  type="password"
-                  value={values.confirmPassword}
-                  name="confirmPassword"
-                  onBlur={handleBlur}
-                  onChange={handleChange}
-                  placeholder="Enter confirm password"
-                />
-              </Stack>
-              {touched.confirmPassword && errors.confirmPassword && (
-                <FormHelperText error id="helper-text-confirm-password-reset">
-                  {errors.confirmPassword}
-                </FormHelperText>
-              )}
-            </Grid>
-
-            {errors.submit && (
+            },
+            (res) => {
+              setErrors({ submit: res.error });
+              setSubmitting(false);
+            }
+          );
+        }}
+      >
+        {({ errors, handleBlur, handleChange, handleSubmit, isSubmitting, touched, values }) => (
+          <form noValidate onSubmit={handleSubmit}>
+            <input name="csrfToken" type="hidden" defaultValue={csrfToken} />
+            <Grid container spacing={3}>
               <Grid item xs={12}>
-                <FormHelperText error>{errors.submit}</FormHelperText>
+                <Stack spacing={1}>
+                  <InputLabel htmlFor="email-reset">Email Address</InputLabel>
+                  <OutlinedInput
+                    id="email-reset"
+                    type="email"
+                    value={values.email}
+                    name="email"
+                    onBlur={handleBlur}
+                    onChange={handleChange}
+                    placeholder="Enter email address"
+                    fullWidth
+                    error={Boolean(touched.email && errors.email)}
+                  />
+                </Stack>
+                {touched.email && errors.email && (
+                  <FormHelperText error id="standard-weight-helper-text-email-reset">
+                    {errors.email}
+                  </FormHelperText>
+                )}
               </Grid>
-            )}
-            <Grid item xs={12}>
-              <AnimateButton>
-                <Button disableElevation disabled={isSubmitting} fullWidth size="large" type="submit" variant="contained" color="primary">
-                  Reset Password
-                </Button>
-              </AnimateButton>
+
+              <Grid item xs={12}>
+                <Stack spacing={1}>
+                  <InputLabel htmlFor="current-password-reset">Current Password</InputLabel>
+                  <OutlinedInput
+                    fullWidth
+                    color={capsWarning ? 'warning' : 'primary'}
+                    error={Boolean(touched.currentPassword && errors.currentPassword)}
+                    id="current-password-reset"
+                    type={showCurrentPassword ? 'text' : 'password'}
+                    value={values.currentPassword}
+                    name="currentPassword"
+                    onBlur={(event: FocusEvent<any, Element>) => {
+                      setCapsWarning(false);
+                      handleBlur(event);
+                    }}
+                    onKeyDown={onKeyDown}
+                    onChange={handleChange}
+                    endAdornment={
+                      <InputAdornment position="end">
+                        <IconButton
+                          aria-label="toggle current password visibility"
+                          onClick={handleClickShowCurrentPassword}
+                          onMouseDown={handleMouseDownPassword}
+                          edge="end"
+                          color="secondary"
+                        >
+                          {showCurrentPassword ? <EyeOutlined /> : <EyeInvisibleOutlined />}
+                        </IconButton>
+                      </InputAdornment>
+                    }
+                    placeholder="Enter current password"
+                  />
+                  {capsWarning && (
+                    <Typography variant="caption" sx={{ color: 'warning.main' }} id="warning-helper-text-current-password">
+                      Caps lock on!
+                    </Typography>
+                  )}
+                </Stack>
+                {touched.currentPassword && errors.currentPassword && (
+                  <FormHelperText error id="standard-weight-helper-text-current-password-reset">
+                    {errors.currentPassword}
+                  </FormHelperText>
+                )}
+              </Grid>
+
+              <Grid item xs={12}>
+                <Stack spacing={1}>
+                  <InputLabel htmlFor="new-password-reset">New Password</InputLabel>
+                  <OutlinedInput
+                    fullWidth
+                    color={capsWarning ? 'warning' : 'primary'}
+                    error={Boolean(touched.newPassword && errors.newPassword)}
+                    id="new-password-reset"
+                    type={showNewPassword ? 'text' : 'password'}
+                    value={values.newPassword}
+                    name="newPassword"
+                    onBlur={(event: FocusEvent<any, Element>) => {
+                      setCapsWarning(false);
+                      handleBlur(event);
+                    }}
+                    onKeyDown={onKeyDown}
+                    onChange={handleChange}
+                    endAdornment={
+                      <InputAdornment position="end">
+                        <IconButton
+                          aria-label="toggle new password visibility"
+                          onClick={handleClickShowNewPassword}
+                          onMouseDown={handleMouseDownPassword}
+                          edge="end"
+                          color="secondary"
+                        >
+                          {showNewPassword ? <EyeOutlined /> : <EyeInvisibleOutlined />}
+                        </IconButton>
+                      </InputAdornment>
+                    }
+                    placeholder="Enter new password"
+                  />
+                  {capsWarning && (
+                    <Typography variant="caption" sx={{ color: 'warning.main' }} id="warning-helper-text-new-password">
+                      Caps lock on!
+                    </Typography>
+                  )}
+                </Stack>
+                {touched.newPassword && errors.newPassword && (
+                  <FormHelperText error id="standard-weight-helper-text-new-password-reset">
+                    {errors.newPassword}
+                  </FormHelperText>
+                )}
+              </Grid>
+
+              {errors.submit && (
+                <Grid item xs={12}>
+                  <FormHelperText error>{errors.submit}</FormHelperText>
+                </Grid>
+              )}
+
+              <Grid item xs={12}>
+                <AnimateButton>
+                  <Button disableElevation disabled={isSubmitting} fullWidth size="large" type="submit" variant="contained" color="primary">
+                    Reset Password
+                  </Button>
+                </AnimateButton>
+              </Grid>
             </Grid>
-          </Grid>
-        </form>
-      )}
-    </Formik>
+          </form>
+        )}
+      </Formik>
+    </>
   );
 }

@@ -5,21 +5,18 @@ import Grid from '@mui/material/Grid';
 import Pagination from '@mui/material/Pagination';
 import Container from '@mui/material/Container';
 import BookCard from 'components/BookCard';
-import SearchBar from 'components/SearchBar';
 import Link from 'next/link';
 
 import axios from 'utils/axios';
 import { IBook } from 'types/book';
 
 export default function BookListPage() {
-  const [searchQuery, setSearchQuery] = React.useState<string>('');
   const [books, setBooks] = React.useState<IBook[]>([]);
   const [totalResults, setTotalResults] = React.useState<number>(0);
   const [currentPage, setPageNumber] = React.useState<number>(0);
   const [resultsPerPage, setResultsPerPage] = React.useState<number>(51);
 
   // vercel temp fix
-  console.log(searchQuery);
   console.log(setResultsPerPage);
 
   React.useEffect(() => {
@@ -34,18 +31,12 @@ export default function BookListPage() {
       .catch((error) => console.error(error));
   }, [currentPage, resultsPerPage]);
 
-  const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchQuery(event.target.value.toLowerCase());
-    console.log(event.target.value.toLowerCase());
-  };
-
   const handlePagination = (event: React.ChangeEvent<unknown>, page: number) => {
     setPageNumber(page);
   };
 
   return (
     <Container>
-      <SearchBar onUpdate={handleSearchChange} />
       <Grid container columns={3} spacing={2} sx={{ justifyContent: 'spaceAround', display: 'flex' }}>
         {books.map((data) => (
           <Grid item key={data.title} xs={1}>

@@ -6,6 +6,7 @@ import MessageOutlined from '@ant-design/icons/MessageOutlined';
 import EmailIcon from '@mui/icons-material/Email';
 import SendIcon from '@mui/icons-material/Send';
 import SearchIcon from '@mui/icons-material/Search';
+import FormatListBulletedIcon from '@mui/icons-material/FormatListBulleted';
 import LibraryBooksIcon from '@mui/icons-material/LibraryBooks';
 import AddIcon from '@mui/icons-material/Add';
 
@@ -13,7 +14,7 @@ import AddIcon from '@mui/icons-material/Add';
 import { NavItemType } from 'types/menu';
 
 // icons
-const icons = { MessageOutlined, EmailIcon, SendIcon, SearchIcon, LibraryBooksIcon, AddIcon };
+const icons = { FormatListBulletedIcon, MessageOutlined, EmailIcon, SendIcon, SearchIcon, LibraryBooksIcon, AddIcon };
 
 // ==============================|| MENU ITEMS - PAGES ||============================== //
 
@@ -55,7 +56,7 @@ const pages: NavItemType = {
           title: <FormattedMessage id="view-books" />,
           type: 'item',
           url: '/viewbooks',
-          icon: icons.SearchIcon
+          icon: icons.FormatListBulletedIcon
         },
         {
           id: 'add-book',
