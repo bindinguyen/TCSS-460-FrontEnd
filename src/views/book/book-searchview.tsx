@@ -2,7 +2,6 @@
 
 import * as React from 'react';
 import Grid from '@mui/material/Grid';
-import Pagination from '@mui/material/Pagination';
 import Container from '@mui/material/Container';
 import TextField from '@mui/material/TextField';
 import FormControl from '@mui/material/FormControl';
@@ -24,8 +23,6 @@ export default function BookListPage() {
   const [searchCriteria, setSearchCriteria] = React.useState<string>('title');
   const [books, setBooks] = React.useState<IBook[]>([]);
   const [totalResults, setTotalResults] = React.useState<number>(0);
-  const [currentPage, setPageNumber] = React.useState<number>(1);
-  const [resultsPerPage, setResultsPerPage] = React.useState<number>(51);
   const [isLoading, setIsLoading] = React.useState<boolean>(false);
   const [hasSearched, setHasSearched] = React.useState<boolean>(false);
 
@@ -62,42 +59,45 @@ export default function BookListPage() {
   };
 
   // Load books from API (either search or browse all)
-  const loadBooks = React.useCallback(async (query: string, criteria: string, page: number) => {
-    if (!query.trim()) {
-      setBooks([]);
-      setTotalResults(0);
-      setHasSearched(false);
-      return;
-    }
-
-    setIsLoading(true);
-    try {
-      // Make specific search API call based on criteria
-      const endpoint = getSearchEndpoint(criteria, query.trim(), page, resultsPerPage);
-      console.log(`ENDPOINT: ${endpoint}`)
-      const response = await axios.get(endpoint);
-      if(criteria == 'isbn13') {
-        console.log("a book was searched for by isbn");
-        setBooks(response.data.book ? [response.data.book] : []);
-      } else {
-        setBooks(response.data.books || []);
+  const loadBooks = React.useCallback(
+    async (query: string, criteria: string, page: number) => {
+      if (!query.trim()) {
+        setBooks([]);
+        setTotalResults(0);
+        setHasSearched(false);
+        return;
       }
-      setTotalResults(response.data.pagination?.totalRecords || 0);
-      setHasSearched(true);
 
-    } catch (error) {
-      console.error('Error loading books:', error);
-      setBooks([]);
-      setTotalResults(0);
-      setHasSearched(true);
-    } finally {
-      setIsLoading(false);
-    }
-  }, [resultsPerPage]);
+      setIsLoading(true);
+      try {
+        // Make specific search API call based on criteria
+        const endpoint = getSearchEndpoint(criteria, query.trim(), page, 50);
+        console.log(`ENDPOINT: ${endpoint}`);
+        const response = await axios.get(endpoint);
+        if (criteria == 'isbn13') {
+          console.log('a book was searched for by isbn');
+          setBooks(response.data.book ? [response.data.book] : []);
+          setTotalResults([response.data.book].length || 0);
+        } else {
+          setBooks(response.data.books || []);
+          setTotalResults(response.data.books.length || 0);
+          console.log(response.data.books.length);
+        }
+        setHasSearched(true);
+      } catch (error) {
+        console.error('Error loading books:', error);
+        setBooks([]);
+        setTotalResults(0);
+        setHasSearched(true);
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [50]
+  );
 
   // Handle search button click
   const handleSearchClick = () => {
-    setPageNumber(1); // Reset to first page when new search
     loadBooks(searchQuery, searchCriteria, 1);
   };
 
@@ -116,11 +116,6 @@ export default function BookListPage() {
     setSearchCriteria(event.target.value);
     setSearchQuery(''); // Clear search when changing criteria
   };
-
-  const handlePagination = (event: React.ChangeEvent<unknown>, page: number) => {
-    setPageNumber(page);
-    loadBooks(searchQuery, searchCriteria, page);
-  }; 
 
   const currentOption = searchOptions.find((opt) => opt.value === searchCriteria);
 
@@ -190,10 +185,10 @@ export default function BookListPage() {
           </Grid>
 
           <Grid item xs={12} md={2}>
-            <Button 
-              fullWidth 
-              variant="contained" 
-              onClick={handleSearchClick} 
+            <Button
+              fullWidth
+              variant="contained"
+              onClick={handleSearchClick}
               sx={{ height: '56px' }}
               startIcon={<span>🔍</span>}
               disabled={!searchQuery.trim() || isLoading}
@@ -213,12 +208,6 @@ export default function BookListPage() {
             ) : (
               <>
                 {totalResults} result{totalResults !== 1 ? 's' : ''} found
-                {searchQuery && (
-                  <span style={{ fontWeight: 500 }}>
-                    {' '}
-                    for '{searchQuery}' in {currentOption?.label.toLowerCase()}
-                  </span>
-                )}
               </>
             )}
           </Typography>
@@ -277,21 +266,6 @@ export default function BookListPage() {
           <Typography variant="body1" color="text.secondary">
             Enter your search criteria and click the search button to find books
           </Typography>
-        </Box>
-      )}
-
-      {/* Pagination */}
-      {!isLoading && hasSearched && totalResults > resultsPerPage && (
-        <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
-          <Pagination
-            count={Math.ceil(totalResults / resultsPerPage)}
-            page={currentPage}
-            onChange={handlePagination}
-            color="primary"
-            size="large"
-            disabled={isLoading}
-            sx={{ '& .MuiPagination-ul': { justifyContent: 'center' } }}
-          />
         </Box>
       )}
     </Container>

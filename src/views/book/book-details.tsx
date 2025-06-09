@@ -59,7 +59,13 @@ const BookDetails = () => {
         Back to Book List
       </Button>
       <Card>
-        <CardMedia component="img" height="350" image={book.image_url} alt={JSON.stringify(book.title)} sx={{ height: 200, width: 140, objectFit: 'contain', mx: 'auto', my: 2 }} />
+        <CardMedia
+          component="img"
+          height="350"
+          image={book.image_url}
+          alt={JSON.stringify(book.title)}
+          sx={{ height: 200, width: 140, objectFit: 'contain', mx: 'auto', my: 2 }}
+        />
         <CardContent>
           <Stack direction="row" alignItems="center" spacing={2}>
             <Typography variant="h4" gutterBottom>

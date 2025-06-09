@@ -80,6 +80,32 @@ export const authOptions: NextAuthOptions = {
           throw new Error(errorMessage);
         }
       }
+    }),
+    CredentialsProvider({
+      id: 'reset-password',
+      name: 'reset-password',
+      credentials: {
+        email: { name: 'email', label: 'Email', type: 'email', placeholder: 'Enter Email' },
+        currentPassword: { name: 'currentPassword', label: 'Password', type: 'password', placeholder: 'Enter Password' },
+        newPassword: { name: 'newPassword', label: 'Password', type: 'password', placeholder: 'Enter Password' }
+      },
+      async authorize(credentials) {
+        try {
+          const user = await axios.patch('/changePassword', {
+            email: credentials?.email,
+            oldPassword: credentials?.currentPassword,
+            newPassword: credentials?.newPassword
+          });
+          if (user) {
+            user.data.user['accessToken'] = user.data.accessToken;
+            return user.data.user;
+          }
+        } catch (e: any) {
+          console.error(e);
+          const errorMessage = e?.message || e?.response?.data?.message || 'Something went wrong!';
+          throw new Error(errorMessage);
+        }
+      }
     })
   ],
   callbacks: {
